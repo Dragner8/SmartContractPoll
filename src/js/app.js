@@ -37,10 +37,10 @@ window.App = {
           instance.addCandidate("Candidate1","Democratic").then(function(result){
             console.log(result)
         // adds candidates to Contract if t
-            $("#candidate-box").append("<div class='form-check'><input class='form-check-input' type='checkbox' value='' id=${result.logs[0].args.candidateID}><label class='form-check-label' for=0>Candidate1</label></div>")
+            $("#candidate-box").append("<div class='form-check'><input class='form-check-input' type='checkbox' value='' id="+result.logs[0].args.candidateID+"><label class='form-check-label' for=0>Candidate1</label></div>")
           })
           instance.addCandidate("Candidate2","Republican").then(function(result){
-            $("#candidate-box").append("<div class='form-check'><input class='form-check-input' type='checkbox' value='' id=${result.logs[0].args.candidateID}><label class='form-check-label' for=1>Candidate2</label></div>")
+            $("#candidate-box").append("<div class='form-check'><input class='form-check-input' type='checkbox' value='' id="+result.logs[0].args.candidateID+"><label class='form-check-label' for=1>Candidate2</label></div>")
           })
           // the global variable will take the value of this variable
           num = 2

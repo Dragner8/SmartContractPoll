@@ -2,68 +2,110 @@ pragma solidity ^0.4.18;
 
 contract Voting {
     
-    event AddedCandidate(uint candidateID);
+    // event AddedCandidate(uint candidateID);
 
-   
+
     struct Voter {
-        bytes32 uid; // bytes32 type are basically strings
-        uint candidateIDVote;
+        string uid; // bytes32 type are basically strings
+        uint deposit;
+        bool voted;
     }
-   
+
     struct Candidate {
-        bytes32 name;
-        bytes32 party; 
-        bool doesExist; 
+        string name;
+        string tags;
+        uint totalvote;
     }
 
-     
-    uint numCandidates; 
-    uint numVoters;
 
-    
-    
+    uint public numCandidates;
+
+
+
     mapping (uint => Candidate) candidates;
-    mapping (uint => Voter) voters;
-    
-   
+    mapping (address => Voter) voters;
 
-    function addCandidate(bytes32 name, bytes32 party) public {
+
+
+    function addCandidate(string name, string party) external {
         // candidateID is the return variable
-        uint candidateID = numCandidates++;
+
         // Create new Candidate Struct with name and saves it to storage.
-        candidates[candidateID] = Candidate(name,party,true);
-        AddedCandidate(candidateID);
+        candidates[numCandidates] = Candidate(name,party, 0);
+        numCandidates++;
+        // emit AddedCandidate(candidateID);
     }
 
-    function vote(bytes32 uid, uint candidateID) public {
+    function vote(string uid, uint candidateID, address a) external payable{
         // checks if the struct exists for that candidate
-        if (candidates[candidateID].doesExist == true) {
-            uint voterID = numVoters++; //voterID is the return variable
-            voters[voterID] = Voter(uid,candidateID);
+        require(msg.value == 1);
+        voters[a] = Voter(uid,msg.value,true);
+        candidates[candidateID].totalvote ++;
+
+
+
+    }
+    function hasVoted(address a) view external returns (bool){
+        return voters[a].voted;
+    }
+
+
+    function totalVotes(uint candidateID) view external returns (uint) {
+
+        return candidates[candidateID].totalvote;
+    }
+
+
+    function getCandidate(uint candidateID) external view returns (uint,string, string) {
+        return (candidateID,candidates[candidateID].name,candidates[candidateID].tags);
+    }
+}
+
+contract Creator {
+    struct Voting_map {
+        Voting v;
+        string title;
+    }
+    mapping (uint => Voting_map) voting;
+    mapping (uint => address) is_alive;
+    uint numCreate;
+
+    function create(string title) public payable returns (uint) {
+            require(msg.value == 10);
+            voting[numCreate].v = new Voting();
+            voting[numCreate].title = title;
+            is_alive[numCreate] = msg.sender;
+            numCreate ++;
+            return numCreate-1;
+
+
+
+    }
+    function addCanditeds(uint to_vote, string name, string party) public{
+        if(is_alive[to_vote] == msg.sender){
+            voting[to_vote].v.addCandidate(name, party);
         }
     }
+    function c_vote(uint to_vote, string uid, uint candidateID) public payable {
+        if(!voting[to_vote].v.hasVoted(msg.sender)){
+            require(msg.value == 1);
+            voting[to_vote].v.vote.value(msg.value)(uid, candidateID, msg.sender);
 
-   
-    function totalVotes(uint candidateID) view public returns (uint) {
-        uint numOfVotes = 0; // we will return this
-        for (uint i = 0; i < numVoters; i++) {
-            // if the voter votes for this specific candidate, we increment the number
-            if (voters[i].candidateIDVote == candidateID) {
-                numOfVotes++;
-            }
         }
-        return numOfVotes; 
+    }
+    function total_votes(uint to_vote, uint candidateID) view public returns (uint) {
+
+        return voting[to_vote].v.totalVotes(candidateID);
+    }
+    function get_can(uint to_vote, uint candidateID) public view returns (uint,string, string) {
+        return voting[to_vote].v.getCandidate(candidateID);
+    }
+    function get_total_can(uint to_vote) public view returns (uint) {
+        return voting[to_vote].v.numCandidates();
+    }
+    function get_num_cont() public view returns (uint){
+        return numCreate;
     }
 
-    function getNumOfCandidates() public view returns(uint) {
-        return numCandidates;
-    }
 
-    function getNumOfVoters() public view returns(uint) {
-        return numVoters;
-    }
-
-    function getCandidate(uint candidateID) public view returns (uint,bytes32, bytes32) {
-        return (candidateID,candidates[candidateID].name,candidates[candidateID].party);
-    }
 }
