@@ -94,7 +94,9 @@ contract Creator {
             voting[to_vote].v.vote.value(msg.value)(uid, candidateID, msg.sender);
 
         }
-        revert();
+        else{
+            revert();
+        }
     }
     function total_votes(uint to_vote, uint candidateID) view public returns (uint) {
 
