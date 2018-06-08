@@ -106,6 +106,9 @@ contract Creator {
     function get_total_can(uint to_vote) public view returns (uint) {
         return voting[to_vote].v.numCandidates();
     }
+    function get_title(uint to_vote) public view returns (string) {
+        return voting[to_vote].title;
+    }
     function get_num_cont() public view returns (uint){
         return numCreate;
     }
