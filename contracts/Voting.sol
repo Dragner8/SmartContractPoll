@@ -65,6 +65,7 @@ contract Creator {
     struct Voting_map {
         Voting v;
         string title;
+        uint am;
     }
     mapping (uint => Voting_map) voting;
     mapping (uint => address) is_alive;
@@ -74,6 +75,7 @@ contract Creator {
             require(msg.value == 10);
             voting[numCreate].v = new Voting();
             voting[numCreate].title = title;
+            voting[numCreate].am += msg.value;
             is_alive[numCreate] = msg.sender;
             numCreate ++;
             return numCreate-1;
@@ -92,6 +94,7 @@ contract Creator {
             voting[to_vote].v.vote.value(msg.value)(uid, candidateID, msg.sender);
 
         }
+        revert();
     }
     function total_votes(uint to_vote, uint candidateID) view public returns (uint) {
 
@@ -109,3 +112,5 @@ contract Creator {
 
 
 }
+
+
