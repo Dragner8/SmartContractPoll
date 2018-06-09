@@ -6,7 +6,7 @@ import { default as Web3} from "web3"
 import { default as contract } from "truffle-contract"
 
 // get build artifacts from compiled smart contract and create the truffle contract
-import votingArtifacts from "../../build/contracts/Voting.json"
+import votingArtifacts from "../../build/contracts/Creator.json"
 var VotingContract = contract(votingArtifacts)
 var num = 0
 /*
@@ -25,39 +25,39 @@ window.App = {
       // calls getNumOfCandidates() function in Smart Contract,
       // this is not a transaction though, since the function is marked with "view" and
       // truffle contract automatically knows this
-      instance.getNumOfCandidates().then(function(numOfCandidates){
-
+      instance.create("abc", {value:10}).then(function(numOfCandidates){
+        console.log(numOfCandidates.logs[0].args.numCreate.c[0])
         // adds candidates to Contract if there aren't any
-        if (numOfCandidates.c[0] == 0){
-          console.log(numOfCandidates.c[0])
-          // calls addCandidate() function in Smart Contract and adds candidate with name "Candidate1"
-          // the return value "result" is just the transaction, which holds the logs,
-          // which is an array of trigger events (1 item in this case - "addedCandidate" event)
-          // We use this to get the candidateID
-          instance.addCandidate("Candidate1","Democratic").then(function(result){
-            console.log(result)
-        // adds candidates to Contract if t
-            $("#candidate-box").append("<div class='form-check'><input class='form-check-input' type='checkbox' value='' id="+result.logs[0].args.candidateID+"><label class='form-check-label' for=0>Candidate1</label></div>")
-          })
-          instance.addCandidate("Candidate2","Republican").then(function(result){
-            $("#candidate-box").append("<div class='form-check'><input class='form-check-input' type='checkbox' value='' id="+result.logs[0].args.candidateID+"><label class='form-check-label' for=1>Candidate2</label></div>")
-          })
-          // the global variable will take the value of this variable
-          num = 2
-        }
-        else { // if candidates were already added to the contract we loop through them and display them
-          for (var i = 0; i < numOfCandidates.c[0]; i++ ){
-            // gets candidates and displays them
-            instance.getCandidate(i).then(function(data){
-              console.log(data)
-              $("#candidate-box").append('<div class="form-check"><input class="form-check-input" type="checkbox" value="" id='+data[0].c[0]+'><label class="form-check-label" for=${data[0]}>'+window.web3.toAscii(data[1])+'</label></div>')
-              //   $("#candidate-box").append('<p>alallalalalalaalal</p>');
-            })
-          }
-        }
+        // if (numOfCandidates.c[0] == 0){
+        //   console.log(numOfCandidates.c[0])
+        //   // calls addCandidate() function in Smart Contract and adds candidate with name "Candidate1"
+        //   // the return value "result" is just the transaction, which holds the logs,
+        //   // which is an array of trigger events (1 item in this case - "addedCandidate" event)
+        //   // We use this to get the candidateID
+        //   instance.addCandidate("Candidate1","Democratic").then(function(result){
+        //     console.log(result)
+        // // adds candidates to Contract if t
+        //     $("#candidate-box").append("<div class='form-check'><input class='form-check-input' type='checkbox' value='' id="+result.logs[0].args.candidateID+"><label class='form-check-label' for=0>Candidate1</label></div>")
+        //   })
+        //   instance.addCandidate("Candidate2","Republican").then(function(result){
+        //     $("#candidate-box").append("<div class='form-check'><input class='form-check-input' type='checkbox' value='' id="+result.logs[0].args.candidateID+"><label class='form-check-label' for=1>Candidate2</label></div>")
+        //   })
+        //   // the global variable will take the value of this variable
+        //   num = 2
+        // }
+        // else { // if candidates were already added to the contract we loop through them and display them
+        //   for (var i = 0; i < numOfCandidates.c[0]; i++ ){
+        //     // gets candidates and displays them
+        //     instance.getCandidate(i).then(function(data){
+        //       console.log(data)
+        //       $("#candidate-box").append('<div class="form-check"><input class="form-check-input" type="checkbox" value="" id='+data[0].c[0]+'><label class="form-check-label" for=${data[0]}>'+window.web3.toAscii(data[1])+'</label></div>')
+        //       //   $("#candidate-box").append('<p>alallalalalalaalal</p>');
+        //     })
+          // }
+        // }
         // sets global variable for number of Candidates
         // displaying and counting the number of Votes depends on this
-        num = numOfCandidates.c[0]
+        // num = numOfCandidates.c[0]
       })
     }).catch(function(err){
       console.error("ERROR! " + err.message)
