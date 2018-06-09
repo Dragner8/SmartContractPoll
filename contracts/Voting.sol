@@ -71,14 +71,16 @@ contract Creator {
     mapping (uint => address) is_alive;
     uint numCreate;
 
-    function create(string title) public payable returns (uint) {
+    event CreateVoting(uint numCreate);
+
+    function create(string title) public payable {
             require(msg.value == 10);
             voting[numCreate].v = new Voting();
             voting[numCreate].title = title;
             voting[numCreate].am += msg.value;
             is_alive[numCreate] = msg.sender;
+            emit CreateVoting(numCreate);
             numCreate ++;
-            return numCreate-1;
 
 
 
