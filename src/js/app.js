@@ -93,7 +93,7 @@ window.App = {
 		VotingContract.deployed().then(function(instance){
 
 			     
-				      instance.addCanditeds(number,obj.val(),"dupa").then(function(){
+				      instance.addCanditeds(number,"siema","dupa").then(function(){
 						
 						
 				      })
@@ -121,7 +121,7 @@ window.App = {
         	//$("#create-box").append(amount.c[0])
 	     	console.log(amount.c[0]+" "+ contractID);
 			for (var i = 0; i < amount.c[0]; i++) { 
-				instance.get_can.call(contractID,amount.c[0]).then(function(answer){
+				instance.get_can(contractID,amount.c[0]).then(function(answer){
 					//$("#create-box").append(answer+"<br>")
 			     		console.log(answer);
 			      	})		    
