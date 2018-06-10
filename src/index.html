@@ -17,24 +17,25 @@
         <div>
           <h1 class="text-center">Ethereum Voting Dapp</h1>
           <hr/>
+		<button class="btn btn-primary" onclick="App.list()">Lista ankiet</button>
+		<button class="btn btn-primary" onclick="App.create()">Utwórz ankiete</button>
+		
+		Adres:
+		<select class="btn btn-primary" id="mySelect">
+		  
+		  
+		</select>
+		<hr/>
           <br/>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-4">
-          <p>Add ID and click candidate to vote</p>
-          <div class="input-group mb-3">
-            <input type="text" class="form-control" id="id-input" placeholder="Enter ID">
-          </div>
-          <div id="candidate-box"></div>
-          <button class="btn btn-primary" onclick="App.vote()">Vote</button>
-          <div id="msg"></div>
-        </div>
-        <div class="col-md-6">
-            <button class="btn btn-primary" onclick="App.findNumOfVotes()">Count Votes</button>
-            <div id="vote-box"></div>
-        </div>
-      </div>
+      <div id="content" class="row">
+        
+	
+
+	<div id= "create-box">
+	</div>
+
     </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

@@ -8,62 +8,115 @@ import { default as contract } from "truffle-contract"
 // get build artifacts from compiled smart contract and create the truffle contract
 import votingArtifacts from "../../build/contracts/Creator.json"
 var VotingContract = contract(votingArtifacts)
-var num = 0
+
 /*
  * This holds all the functions for the app
  */
 window.App = {
   // called when web3 is set up
   start: function() {
+	for (var i = 0; i < 10; i++) { 
+		$("#mySelect").append("<option >"+window.web3.eth.accounts[i]+"</option>");		    
+						
+	}
     // setting up contract providers and transaction defaults for ALL contract instances
     VotingContract.setProvider(window.web3.currentProvider)
     VotingContract.defaults({from: window.web3.eth.accounts[0],gas:6721975})
-
+	
     // creates an VotingContract instance that represents default address managed by VotingContract
     VotingContract.deployed().then(function(instance){
 
-      // calls getNumOfCandidates() function in Smart Contract,
-      // this is not a transaction though, since the function is marked with "view" and
-      // truffle contract automatically knows this
+     
       instance.create("abc", {value:10}).then(function(numOfCandidates){
         console.log(numOfCandidates.logs[0].args.numCreate.c[0])
-        // adds candidates to Contract if there aren't any
-        // if (numOfCandidates.c[0] == 0){
-        //   console.log(numOfCandidates.c[0])
-        //   // calls addCandidate() function in Smart Contract and adds candidate with name "Candidate1"
-        //   // the return value "result" is just the transaction, which holds the logs,
-        //   // which is an array of trigger events (1 item in this case - "addedCandidate" event)
-        //   // We use this to get the candidateID
-        //   instance.addCandidate("Candidate1","Democratic").then(function(result){
-        //     console.log(result)
-        // // adds candidates to Contract if t
-        //     $("#candidate-box").append("<div class='form-check'><input class='form-check-input' type='checkbox' value='' id="+result.logs[0].args.candidateID+"><label class='form-check-label' for=0>Candidate1</label></div>")
-        //   })
-        //   instance.addCandidate("Candidate2","Republican").then(function(result){
-        //     $("#candidate-box").append("<div class='form-check'><input class='form-check-input' type='checkbox' value='' id="+result.logs[0].args.candidateID+"><label class='form-check-label' for=1>Candidate2</label></div>")
-        //   })
-        //   // the global variable will take the value of this variable
-        //   num = 2
-        // }
-        // else { // if candidates were already added to the contract we loop through them and display them
-        //   for (var i = 0; i < numOfCandidates.c[0]; i++ ){
-        //     // gets candidates and displays them
-        //     instance.getCandidate(i).then(function(data){
-        //       console.log(data)
-        //       $("#candidate-box").append('<div class="form-check"><input class="form-check-input" type="checkbox" value="" id='+data[0].c[0]+'><label class="form-check-label" for=${data[0]}>'+window.web3.toAscii(data[1])+'</label></div>')
-        //       //   $("#candidate-box").append('<p>alallalalalalaalal</p>');
-        //     })
-          // }
-        // }
-        // sets global variable for number of Candidates
-        // displaying and counting the number of Votes depends on this
-        // num = numOfCandidates.c[0]
+     
       })
     }).catch(function(err){
       console.error("ERROR! " + err.message)
     })
   },
 
+  getPolls: function(i){
+ 		VotingContract.deployed().then(function(instance){
+	      instance.get_title(i).then(function(name){
+		
+		$("#create-box").append(name + " <button class='btn btn-primary' onclick='App.show("+i+")'>Pokaż</button> <br>");
+				
+	      })
+	    }).catch(function(err){
+	      console.error("ERROR! " + err.message)
+	    })
+
+},
+  create: function(){
+		
+	$("#create-box").empty();
+	$("#create-box").append("<input type='text' class='form-control' id='contract-title'   placeholder='Zadaj pytanie'> <br>");
+	$("#create-box").append("<form id='input-form'></form>");
+ 	$("#input-form").append("<input type='text' class='form-control' id='id-input'   placeholder='Dodaj odpowiedź'>");
+	$("#input-form").append("<input type='text' class='form-control' id='id-input'  placeholder='Dodaj odpowiedź'>");
+	
+	$("#input-form").children('input').each(function(k){
+        var obj = $(this); 
+        console.log(obj.val());
+   	})
+
+	$("#create-box").append( " <button class='btn btn-primary' onclick='App.addAnswer()'>+</button> ");
+	$("#create-box").append( "  <button  class='btn btn-primary' onclick='App.createContract()'>Utwórz</button> ");
+  },
+
+  addAnswer: function(){
+	$("#input-form").append("<input type='text' class='form-control' id='id-input'  placeholder='Dodaj odpowiedź'>");
+  },
+  createContract: function(number){
+	var flag = true;
+	$("#input-form").children('input').each(function(k){
+        
+		var obj = $(this); 
+		if(flag){
+
+			   VotingContract.deployed().then(function(instance){
+
+			     
+			      instance.create(obj.val(), {value:10}).then(function(numOfCandidates){
+				console.log(numOfCandidates.logs[0].args.numCreate.c[0])
+			     
+			      })
+			    }).catch(function(err){
+			      console.error("ERROR! " + err.message)
+			    })
+
+			flag=false;
+		}
+		else{
+			console.log(obj.val());
+		}
+   	})
+  },	
+
+   show: function(number){
+	$("#create-box").empty();
+ 	console.log(number);
+  },	
+
+  list: function(){
+		
+	$("#create-box").empty();
+	VotingContract.deployed().then(function(instance){
+	      instance.get_num_cont().then(function(number){
+		console.log(number.c[0]);
+
+				for (var i = 0; i < number.c[0]; i++) { 
+					    App.getPolls(i);
+						
+				}
+	      })
+	    }).catch(function(err){
+	      console.error("ERROR! " + err.message)
+	    })
+
+	
+  },
   // Function that is called when user clicks the "vote" button
   vote: function() {
     var uid = $("#id-input").val() //getting user inputted id
