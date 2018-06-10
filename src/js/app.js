@@ -69,34 +69,71 @@ window.App = {
 	$("#input-form").append("<input type='text' class='form-control' id='id-input'  placeholder='Dodaj odpowiedź'>");
   },
   createContract: function(number){
-	var flag = true;
-	$("#input-form").children('input').each(function(k){
-        
-		var obj = $(this); 
-		if(flag){
-
-			   VotingContract.deployed().then(function(instance){
+	
+	var name=$("#contract-title").val();
+	var id;
+	 VotingContract.deployed().then(function(instance){
 
 			     
-			      instance.create(obj.val(), {value:10}).then(function(numOfCandidates){
+			      instance.create(name, {value:10}).then(function(numOfCandidates){
 				console.log(numOfCandidates.logs[0].args.numCreate.c[0])
-			     
+			     	id=(numOfCandidates.logs[0].args.numCreate.c[0])
+				App.addCandidates(id);			
+						
 			      })
 			    }).catch(function(err){
 			      console.error("ERROR! " + err.message)
 			    })
 
-			flag=false;
-		}
-		else{
-			console.log(obj.val());
-		}
-   	})
+	
   },	
+   addCandidates: function(number){
+	$("#input-form").children('input').each(function(k){
+        var obj = $(this); 
+		VotingContract.deployed().then(function(instance){
 
-   show: function(number){
+			     
+				      instance.addCanditeds(number,obj.val(),"dupa").then(function(){
+						
+						
+				      })
+			    }).catch(function(err){
+			      console.error("ERROR! " + err.message)
+			    })
+
+        console.log(obj.val() +" "+ number );
+    })
+
+},
+
+   show: function(contractID){
 	$("#create-box").empty();
- 	console.log(number);
+
+	VotingContract.deployed().then(function(instance){
+
+     
+      	instance.get_title(contractID).then(function(name){
+        	$("#create-box").append(name+"<br>")
+     
+      	})
+
+		instance.get_total_can(contractID).then(function(amount){
+        	//$("#create-box").append(amount.c[0])
+	     	console.log(amount.c[0]+" "+ contractID);
+			for (var i = 0; i < amount.c[0]; i++) { 
+				instance.get_can.call(contractID,amount.c[0]).then(function(answer){
+					//$("#create-box").append(answer+"<br>")
+			     		console.log(answer);
+			      	})		    
+						
+			}
+      		})
+
+    }).catch(function(err){
+      console.error("ERROR! " + err.message)
+    })
+
+ 	
   },	
 
   list: function(){
