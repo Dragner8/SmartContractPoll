@@ -169,7 +169,7 @@ showResults: function(contractID){
 				instance.total_votes(contractID,j).then(function(vote){
 					
 					votes.push(vote.c[0]);
-					$("#result-list").append("<li>"+answers.shift()+" "+votes.shift()+"</li>")
+					$("#result-list").append("<li>"+answers.shift()+" ilość głosów:"+votes.shift()+"</li>")
 			      	})		    
 						
 			}
