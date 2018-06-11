@@ -31,7 +31,8 @@ window.App = {
  		VotingContract.deployed().then(function(instance){
 	      instance.get_title(i).then(function(name){
 		
-		$("#create-box").append(name + " <button class='btn btn-primary' onclick='App.show("+i+")'>Pokaż</button> <br>");
+		$("#create-box").append("<textarea  style='resize:none' rows='1' cols='65' readonly>"
+ +name + "</textarea> <button class='btn btn-primary' onclick='App.show("+i+")'>Pokaż</button> <br>");
 				
 	      })
 	    }).catch(function(err){
@@ -108,6 +109,8 @@ window.App = {
         	$("#create-box").append(name+"<br>  <ul id='list'> </ul> <select class='btn btn-primary' id='voteSelect'> </select>  ")
      		$("#voteSelect").append("   <option disabled selected value> - wybierz opcje - </option>")
 		$("#create-box").append( " <button class='btn btn-primary' onclick='App.vote("+contractID+")'>Głosuj</button> ");
+		$("#create-box").append( " <button class='btn btn-primary' onclick='App.showResults("+contractID+")'>Wyniki</button> <br>");
+		$("#create-box").append("<div id='result'> </div>")
       	})
 
 		instance.get_total_can(contractID).then(function(amount){
@@ -131,6 +134,58 @@ window.App = {
 
  	
   },	
+
+showResults: function(contractID){
+	$("#result").empty();
+
+	VotingContract.deployed().then(function(instance){
+
+     
+      	instance.get_title(contractID).then(function(name){
+        	$("#result").append(name+"<br>  <ul id='result-list'> </ul>")
+      	})
+
+		instance.get_total_can(contractID).then(function(amount){
+        	//$("#create-box").append(amount.c[0])
+		var answers=[];
+		var votes=[];
+		var tmp=0
+		
+	     	console.log(amount.c[0]+" "+ contractID);
+			for (var i = 0; i < amount.c[0]; i++) { 
+				instance.get_can(contractID,i).then(function(answer){
+					
+					
+					answers.push(answer[1]);
+			     		tmp++;
+			      	})		    
+						
+			}
+			tmp=0;
+			for (var j = 0; j < amount.c[0]; j++) { 
+				instance.total_votes(contractID,j).then(function(vote){
+					
+					votes.push(vote.c[0]);
+			     		tmp++;
+			      	})		    
+						
+			}
+			console.log(answers);
+			console.log(votes);
+			for (var j = 0; j < amount.c[0]; j++) { 
+				var append = answers.shift()+" " + votes.shift();
+				console.log(append);
+				$("#result-list").append("<li>"+append+"</li>")	    
+						
+			}
+      		})
+
+    }).catch(function(err){
+      console.error("ERROR! " + err.message)
+    })
+
+
+},
 
   list: function(){
 		
