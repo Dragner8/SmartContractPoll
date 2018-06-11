@@ -137,7 +137,10 @@ window.App = {
 
 showResults: function(contractID){
 	$("#result").empty();
-
+	var answers=[];
+	var votes=[];
+	var a="";
+	var v="";
 	VotingContract.deployed().then(function(instance){
 
      
@@ -147,8 +150,7 @@ showResults: function(contractID){
 
 		instance.get_total_can(contractID).then(function(amount){
         	//$("#create-box").append(amount.c[0])
-		var answers=[];
-		var votes=[];
+		
 		var tmp=0
 		
 	     	console.log(amount.c[0]+" "+ contractID);
@@ -157,27 +159,24 @@ showResults: function(contractID){
 					
 					
 					answers.push(answer[1]);
-			     		tmp++;
+					
 			      	})		    
-						
+					
 			}
+			
 			tmp=0;
 			for (var j = 0; j < amount.c[0]; j++) { 
 				instance.total_votes(contractID,j).then(function(vote){
 					
 					votes.push(vote.c[0]);
-			     		tmp++;
+					$("#result-list").append("<li>"+answers.shift()+" "+votes.shift()+"</li>")
 			      	})		    
 						
 			}
-			console.log(answers);
-			console.log(votes);
-			for (var j = 0; j < amount.c[0]; j++) { 
-				var append = answers.shift()+" " + votes.shift();
-				console.log(append);
-				$("#result-list").append("<li>"+append+"</li>")	    
-						
-			}
+			
+			
+			
+			
       		})
 
     }).catch(function(err){
