@@ -24,16 +24,7 @@ window.App = {
     VotingContract.defaults({from: window.web3.eth.accounts[0],gas:6721975})
 	
     // creates an VotingContract instance that represents default address managed by VotingContract
-    VotingContract.deployed().then(function(instance){
-
-     
-      instance.create("abc", {value:10}).then(function(numOfCandidates){
-        console.log(numOfCandidates.logs[0].args.numCreate.c[0])
-     
-      })
-    }).catch(function(err){
-      console.error("ERROR! " + err.message)
-    })
+   
   },
 
   getPolls: function(i){
@@ -68,18 +59,19 @@ window.App = {
   addAnswer: function(){
 	$("#input-form").append("<input type='text' class='form-control' id='id-input'  placeholder='Dodaj odpowiedź'>");
   },
-  createContract: function(number){
+  createContract: function(){
 	
 	var name=$("#contract-title").val();
 	var id;
 	 VotingContract.deployed().then(function(instance){
 
 			     
-			      instance.create(name, {value:10}).then(function(numOfCandidates){
+			      instance.create(name, {value:10,from: document.getElementById("mySelect").value}).then(function(numOfCandidates){
 				console.log(numOfCandidates.logs[0].args.numCreate.c[0])
 			     	id=(numOfCandidates.logs[0].args.numCreate.c[0])
 				App.addCandidates(id);			
-						
+				$("#create-box").empty();
+				App.show(id);	
 			      })
 			    }).catch(function(err){
 			      console.error("ERROR! " + err.message)
@@ -93,7 +85,7 @@ window.App = {
 		VotingContract.deployed().then(function(instance){
 
 			     
-				      instance.addCanditeds(number,"siema","dupa").then(function(){
+				      instance.addCanditeds(number,obj.val(),"").then(function(){
 						
 						
 				      })
@@ -113,17 +105,21 @@ window.App = {
 
      
       	instance.get_title(contractID).then(function(name){
-        	$("#create-box").append(name+"<br>")
-     
+        	$("#create-box").append(name+"<br>  <ul id='list'> </ul> <select class='btn btn-primary' id='voteSelect'> </select>  ")
+     		$("#voteSelect").append("   <option disabled selected value> - wybierz opcje - </option>")
+		$("#create-box").append( " <button class='btn btn-primary' onclick='App.vote("+contractID+")'>Głosuj</button> ");
       	})
 
 		instance.get_total_can(contractID).then(function(amount){
         	//$("#create-box").append(amount.c[0])
+		var tmp=0;
 	     	console.log(amount.c[0]+" "+ contractID);
 			for (var i = 0; i < amount.c[0]; i++) { 
-				instance.get_can(contractID,amount.c[0]).then(function(answer){
-					//$("#create-box").append(answer+"<br>")
-			     		console.log(answer);
+				instance.get_can(contractID,i).then(function(answer){
+					
+					$("#list").append("<li>"+answer[1]+"</li>")
+					$("#voteSelect").append("<option>"+tmp+". "+answer[1]+"</option>");
+			     		tmp++;
 			      	})		    
 						
 			}
@@ -154,36 +150,23 @@ window.App = {
 
 	
   },
-  // Function that is called when user clicks the "vote" button
-  vote: function() {
-    var uid = $("#id-input").val() //getting user inputted id
+  
+  vote: function(contractID) {
+   		var candidatName= document.getElementById("voteSelect").value;
+    		var candidatID = candidatName.substring(0, 1);
 
-    // Application Logic
-    if (uid == ""){
-      $("#msg").html("<p>Please enter id.</p>")
-      return
-    }
-    // Checks whether a candidate is chosen or not.
-    // if it is, we get the Candidate's ID, which we will use
-    // when we call the vote function in Smart Contracts
-    if ($("#candidate-box :checkbox:checked").length > 0){
-      // just takes the first checked box and gets its id
-      var candidateID = $("#candidate-box :checkbox:checked")[0].id
-        console.log(candidateID)
-    }
-    else {
-      // print message if user didn't vote for candidate
-      $("#msg").html("<p>Please vote for a candidate.</p>")
-      return
-    }
-    // Actually voting for the Candidate using the Contract and displaying "Voted"
-    VotingContract.deployed().then(function(instance){
-      instance.vote(uid,parseInt(candidateID)).then(function(result){
-        $("#msg").html("<p>Voted</p>")
-      })
-    }).catch(function(err){
-      console.error("ERROR! " + err.message)
-    })
+		VotingContract.deployed().then(function(instance){
+
+			     
+		instance.c_vote(contractID,"",candidatID,{value:1, from: document.getElementById("mySelect").value}).then(function(){
+						
+						alert("Dziękujemy za udział w głosowaniu!")
+				      }).catch(function(err){
+					      alert("Już głosowałeś w tej ankiecie!")
+					    })
+			    }).catch(function(err){
+			      	
+			    })
   },
 
   // function called when the "Count Votes" button is clicked
